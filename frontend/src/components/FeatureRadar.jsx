@@ -7,6 +7,11 @@ import {
   Tooltip,
 } from 'recharts';
 
+const NAVY  = '#0B1D3A';
+const GOLD  = '#C5A028';
+const IVORY = '#FDFBF7';
+const FONT  = '"Times New Roman", Times, serif';
+
 function buildRadarData(features, currentPrice) {
   const { RSI = 50, MACD = 0, BB_Width = 0.05, BB_Pivot = 0.5, ATR = 0 } = features;
   const sigmoid = (x, k = 1) => 100 / (1 + Math.exp(-k * x));
@@ -45,25 +50,22 @@ function buildRadarData(features, currentPrice) {
   ];
 }
 
-/* Color a value 0-100 on a green→yellow→orange scale */
-function signalColor(value) {
-  if (value < 35) return 'var(--accent-neon-green)';
-  if (value < 65) return 'var(--text-secondary)';
-  return 'var(--accent-neon-orange)';
-}
-
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
     <div
-      className="rounded-xl border px-4 py-3 shadow-2xl"
-      style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-accent)' }}
+      style={{
+        background: IVORY, border: `1px solid ${NAVY}`,
+        padding: '10px 14px', fontFamily: FONT,
+      }}
     >
-      <p className="label-xs mb-1.5">{d.metric}</p>
-      <p className="text-base font-black text-white font-jetbrains">{d.raw}</p>
-      <p className="text-[10px] mt-1 font-medium" style={{ color: 'var(--text-secondary)' }}>{d.hint}</p>
+      <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7A8EA8', marginBottom: 4 }}>
+        {d.metric}
+      </p>
+      <p style={{ fontSize: 16, fontWeight: 900, color: NAVY }}>{d.raw}</p>
+      <p style={{ fontSize: 10, color: '#3D5275', marginTop: 4 }}>{d.hint}</p>
     </div>
   );
 };
@@ -72,10 +74,13 @@ export default function FeatureRadar({ features, currentPrice }) {
   if (!features || Object.keys(features).length === 0) {
     return (
       <div
-        className="rounded-2xl p-8 flex items-center justify-center h-64 border"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+        style={{
+          background: '#F3F1EB', border: `1px solid rgba(11,29,58,0.15)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          height: 240, fontFamily: FONT,
+        }}
       >
-        <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Feature data unavailable</p>
+        <p style={{ fontSize: 12, color: '#7A8EA8' }}>Feature data unavailable</p>
       </div>
     );
   }
@@ -84,53 +89,72 @@ export default function FeatureRadar({ features, currentPrice }) {
 
   return (
     <div
-      className="rounded-2xl p-6 border flex flex-col gap-5"
-      style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+      style={{
+        background: '#F3F1EB',
+        border: `1px solid rgba(11,29,58,0.15)`,
+        padding: '20px 20px 16px',
+        fontFamily: FONT,
+      }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-white uppercase tracking-widest font-outfit">
-            Feature Decomposition
-          </h3>
-          <p className="label-xs mt-0.5">TA Signal Strengths · Normalized 0–100</p>
-        </div>
+      <div style={{ marginBottom: 12 }}>
+        <h3
+          style={{
+            fontSize: 10, fontWeight: 900, letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: NAVY,
+          }}
+        >
+          Feature Decomposition
+        </h3>
+        <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7A8EA8', marginTop: 3 }}>
+          TA Signal Strengths · Normalised 0–100
+        </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
-        <RadarChart data={data} margin={{ top: 8, right: 18, bottom: 8, left: 18 }}>
-          <PolarGrid stroke="#161616" strokeWidth={1} />
+      <ResponsiveContainer width="100%" height={210}>
+        <RadarChart data={data} margin={{ top: 8, right: 20, bottom: 8, left: 20 }}>
+
+          {/* Navy grid web */}
+          <PolarGrid stroke={NAVY} strokeWidth={0.5} strokeOpacity={0.18} />
+
           <PolarAngleAxis
             dataKey="metric"
-            tick={{ fontSize: 9, fill: '#555', fontWeight: 700, fontFamily: 'Inter' }}
+            tick={{
+              fontSize: 9, fill: '#3D5275', fontWeight: 700,
+              fontFamily: FONT, textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}
             tickLine={false}
           />
+
+          {/* Gold polygon — translucent gold fill, solid gold border */}
           <Radar
             name="Signal"
             dataKey="value"
-            stroke="rgba(255,255,255,0.6)"
+            stroke={GOLD}
             strokeWidth={1.5}
-            fill="rgba(255,255,255,1)"
-            fillOpacity={0.04}
-            dot={{ r: 2.5, fill: '#fff', strokeWidth: 0 }}
-            activeDot={{ r: 4, fill: '#fff', stroke: '#000', strokeWidth: 1 }}
+            fill={GOLD}
+            fillOpacity={0.18}
+            dot={{ r: 2.5, fill: GOLD, strokeWidth: 0 }}
+            activeDot={{ r: 4, fill: GOLD, stroke: IVORY, strokeWidth: 1.5 }}
           />
+
           <Tooltip content={<CustomTooltip />} />
         </RadarChart>
       </ResponsiveContainer>
 
-      {/* Metric legend */}
+      {/* Legend row */}
       <div
-        className="grid grid-cols-5 gap-2 pt-4 border-t"
-        style={{ borderColor: 'var(--border-subtle)' }}
+        style={{
+          display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8,
+          borderTop: `1px solid rgba(11,29,58,0.12)`, paddingTop: 12, marginTop: 4,
+        }}
       >
         {data.map(d => (
-          <div key={d.metric} className="flex flex-col items-center gap-1 text-center">
-            <span className="label-xs">{d.metric}</span>
-            <span
-              className="text-[11px] font-black font-jetbrains"
-              style={{ color: signalColor(d.value) }}
-            >
+          <div key={d.metric} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#7A8EA8' }}>
+              {d.metric}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 900, color: NAVY }}>
               {d.raw}
             </span>
           </div>

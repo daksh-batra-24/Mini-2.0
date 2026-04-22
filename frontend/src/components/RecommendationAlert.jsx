@@ -1,29 +1,33 @@
+const NAVY  = '#0B1D3A';
+const GOLD  = '#C5A028';
+const IVORY = '#FDFBF7';
+const FONT  = '"Times New Roman", Times, serif';
+
+function riskPalette(riskLevel) {
+  if (!riskLevel) return { color: '#7A8EA8', label: 'Analysis Complete' };
+  const l = riskLevel.toLowerCase();
+  if (l.includes('high'))   return { color: '#7A1515', label: 'Critical Condition' };
+  if (l.includes('medium')) return { color: GOLD,      label: 'Pre-Shatter Warning' };
+  return                           { color: '#1A5C2E', label: 'Operational Integrity' };
+}
+
 export default function RecommendationAlert({
   riskLevel,
   recommendation,
   currentPrice,
   features = {},
 }) {
-  const isHighRisk = riskLevel?.toLowerCase().includes('high');
-  const isMediumRisk = riskLevel?.toLowerCase().includes('medium');
+  const palette = riskPalette(riskLevel);
 
-  const getTheme = () => {
-    if (isHighRisk) return { color: 'var(--accent-neon-orange)', label: 'Critical Condition', hex: '#ff5500' };
-    if (isMediumRisk) return { color: 'var(--accent-neon-yellow)', label: 'Pre-Shatter Warning', hex: '#ffdd00' };
-    return { color: 'var(--accent-neon-green)', label: 'Operational Integrity', hex: '#00ff88' };
-  };
-
-  const theme = getTheme();
-
-  const atr = features?.ATR || 0;
-  const stopLossPrice = atr > 0 ? currentPrice - atr * 2 : null;
-  const stopLossPct = atr > 0 ? ((atr * 2) / currentPrice * 100).toFixed(2) : '2.50';
-  const positionPct = atr > 0
+  const atr          = features?.ATR || 0;
+  const stopLoss     = atr > 0 ? currentPrice - atr * 2 : null;
+  const stopLossPct  = atr > 0 ? ((atr * 2) / currentPrice * 100).toFixed(2) : '2.50';
+  const positionPct  = atr > 0
     ? Math.min(100, 1 / parseFloat(stopLossPct) * 100).toFixed(1)
     : null;
 
-  const rsi = features?.RSI;
-  const rsiContext = rsi != null
+  const rsi       = features?.RSI;
+  const rsiLabel  = rsi != null
     ? rsi > 70 ? `Overbought — RSI ${rsi.toFixed(0)}, momentum exhaustion`
     : rsi < 30 ? `Oversold — RSI ${rsi.toFixed(0)}, potential reversal zone`
     : `Neutral momentum — RSI ${rsi.toFixed(0)}`
@@ -37,72 +41,94 @@ export default function RecommendationAlert({
     : 'N/A';
 
   return (
-    <div className="w-full flex flex-col gap-7">
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: FONT }}>
 
-      {/* Price + risk badge */}
-      <div className="flex items-end justify-between">
+      {/* ── Price + Risk Badge ─────────────────────────────────────── */}
+      <div
+        style={{
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+          paddingBottom: 20, borderBottom: '1px solid rgba(11,29,58,0.10)',
+        }}
+      >
         <div>
-          <p className="label-xs mb-2">Live Valuation</p>
-          <p className="text-5xl font-black text-white font-outfit tracking-tighter leading-none">
+          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7A8EA8', marginBottom: 6 }}>
+            Live Valuation
+          </p>
+          <p style={{ fontSize: 44, fontWeight: 900, color: NAVY, lineHeight: 1 }}>
             ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          {rsiContext && (
-            <p className="text-[11px] mt-2 font-medium" style={{ color: 'var(--text-secondary)' }}>{rsiContext}</p>
+          {rsiLabel && (
+            <p style={{ fontSize: 11, color: '#3D5275', marginTop: 6 }}>{rsiLabel}</p>
           )}
         </div>
+
         <div
-          className="px-5 py-2.5 rounded-xl border font-bold text-[11px] uppercase tracking-widest flex-shrink-0"
-          style={{ borderColor: theme.color, color: theme.color, boxShadow: `0 0 18px ${theme.hex}18` }}
+          style={{
+            padding: '8px 18px',
+            border: `1px solid ${palette.color}`,
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: palette.color, fontFamily: FONT, flexShrink: 0,
+          }}
         >
           {riskLevel}
         </div>
       </div>
 
-      {/* Verdict card */}
+      {/* ── Verdict card ──────────────────────────────────────────── */}
       <div
-        className="rounded-2xl p-6 border relative overflow-hidden"
-        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+        style={{
+          background: '#F3F1EB',
+          border: `1px solid rgba(11,29,58,0.15)`,
+          padding: '18px 20px 18px 24px',
+          position: 'relative', overflow: 'hidden',
+        }}
       >
-        {/* Accent strip */}
+        {/* Left accent — 3px navy-adjacent rule in risk color */}
         <div
-          className="absolute inset-y-0 left-0 w-[3px] rounded-l-2xl"
-          style={{ background: theme.color, boxShadow: `0 0 16px ${theme.hex}` }}
+          style={{
+            position: 'absolute', top: 0, left: 0, bottom: 0,
+            width: 3, background: palette.color,
+          }}
         />
-        <div className="pl-5">
-          <p className="label-xs mb-1.5" style={{ color: theme.color }}>{theme.label}</p>
-          <h3 className="text-base font-black text-white uppercase tracking-tight font-outfit mb-2">
-            System Recommendation
-          </h3>
-          <p className="text-sm leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
-            {recommendation}
-          </p>
-        </div>
+        <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.20em', textTransform: 'uppercase', color: palette.color, marginBottom: 6 }}>
+          {palette.label}
+        </p>
+        <h3 style={{ fontSize: 11, fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase', color: NAVY, marginBottom: 8 }}>
+          System Recommendation
+        </h3>
+        <p style={{ fontSize: 13, lineHeight: 1.75, color: '#3D5275' }}>
+          {recommendation}
+        </p>
       </div>
 
-      {/* Execution metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <MetricTile
-          label="Stop-Loss"
-          value={stopLossPrice != null
-            ? `$${stopLossPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-            : 'N/A'}
-          sub={`−${stopLossPct}% · 2× ATR`}
-        />
-        <MetricTile
-          label="ATR 14D"
-          value={atr > 0 ? `$${atr.toFixed(2)}` : 'N/A'}
-          sub="Avg True Range"
-        />
-        <MetricTile
-          label="Position Size"
-          value={positionPct ? `${positionPct}%` : 'N/A'}
-          sub="1% Risk Rule"
-        />
-        <MetricTile
-          label="BB Position"
-          value={bbPivot != null ? `${(bbPivot * 100).toFixed(1)}%` : 'N/A'}
-          sub={bbLabel}
-        />
+      {/* ── Execution Metrics Grid ─────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: 'rgba(11,29,58,0.15)' }}>
+        {[
+          {
+            label: 'Stop-Loss',
+            value: stopLoss != null
+              ? `$${stopLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : 'N/A',
+            sub: `−${stopLossPct}% · 2× ATR`,
+          },
+          {
+            label: 'ATR 14D',
+            value: atr > 0 ? `$${atr.toFixed(2)}` : 'N/A',
+            sub: 'Avg True Range',
+          },
+          {
+            label: 'Position Size',
+            value: positionPct ? `${positionPct}%` : 'N/A',
+            sub: '1% Risk Rule',
+          },
+          {
+            label: 'BB Position',
+            value: bbPivot != null ? `${(bbPivot * 100).toFixed(1)}%` : 'N/A',
+            sub: bbLabel,
+          },
+        ].map(tile => (
+          <MetricTile key={tile.label} {...tile} />
+        ))}
       </div>
     </div>
   );
@@ -111,14 +137,22 @@ export default function RecommendationAlert({
 function MetricTile({ label, value, sub }) {
   return (
     <div
-      className="p-4 rounded-xl border flex flex-col gap-1 transition-colors group cursor-default"
-      style={{ background: 'rgba(0,0,0,0.3)', borderColor: 'var(--border-subtle)' }}
-      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
-      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+      style={{
+        background: IVORY,
+        padding: '14px 18px',
+        display: 'flex', flexDirection: 'column', gap: 4,
+        fontFamily: FONT,
+      }}
     >
-      <p className="label-xs">{label}</p>
-      <p className="text-sm font-black text-white font-jetbrains mt-0.5">{value}</p>
-      <p className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>{sub}</p>
+      <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.20em', textTransform: 'uppercase', color: '#7A8EA8' }}>
+        {label}
+      </p>
+      <p style={{ fontSize: 16, fontWeight: 900, color: NAVY }}>
+        {value}
+      </p>
+      <p style={{ fontSize: 10, color: '#7A8EA8' }}>
+        {sub}
+      </p>
     </div>
   );
 }

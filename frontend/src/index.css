@@ -1,194 +1,162 @@
-/* ── Google Fonts ─────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 @import "tailwindcss";
 
-/* ── Design Tokens: Monochrome Noir ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   TFRO — Institutional Design System
+   Palette: Ivory / Navy / Gold
+   Typography: Times New Roman (serif) throughout
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* Dark Base */
-  --bg-primary: #060606;
-  --bg-card: #0f0f0f;
-  --bg-surface: #141414;
-  --bg-elevated: #1a1a1a;
+  /* ── Backgrounds ──────────────────────────────────────────────── */
+  --bg-primary:  #FDFBF7;   /* ivory — base page */
+  --bg-card:     #FDFBF7;   /* card surface */
+  --bg-surface:  #F3F1EB;   /* recessed / inner surface */
+  --bg-elevated: #EAE8E1;   /* deepest inset */
 
-  /* Borders & Shadows */
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-accent: rgba(255, 255, 255, 0.12);
-  --border-hover: rgba(255, 255, 255, 0.2);
-  --shadow-noir: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset;
-  --shadow-glow-green: 0 0 24px -4px rgba(0, 255, 136, 0.25);
+  /* ── Borders ──────────────────────────────────────────────────── */
+  --border-subtle:  rgba(11, 29, 58, 0.12);
+  --border-accent:  rgba(11, 29, 58, 0.30);
+  --border-hover:   rgba(11, 29, 58, 0.60);
+  --border-navy:    #0B1D3A;
 
-  /* Typography */
-  --text-primary: #ffffff;
-  --text-secondary: #888888;
-  --text-muted: #444444;
+  /* ── Typography ───────────────────────────────────────────────── */
+  --text-primary:   #0B1D3A;   /* deep navy — all body copy */
+  --text-secondary: #3D5275;   /* mid navy — secondary labels */
+  --text-muted:     #7A8EA8;   /* slate — muted / captions */
 
-  /* High-Contrast Neons */
-  --accent-neon-green: #00ff88;
-  --accent-neon-yellow: #ffdd00;
-  --accent-neon-orange: #ff5500;
+  /* ── Accent Palette ───────────────────────────────────────────── */
+  --accent-gold:        #C5A028;  /* primary gold — buttons, active states */
+  --accent-gold-light:  #E8CC6A;  /* light gold — fills, hover tints */
+  --accent-gold-bg:     rgba(197, 160, 40, 0.10); /* translucent gold tint */
 
-  /* Status Base Colors */
-  --status-good: #00ff88;
-  --status-warning: #ffdd00;
-  --status-alert: #ff5500;
+  /* ── Risk Status ──────────────────────────────────────────────── */
+  --accent-neon-green:  #1A5C2E;  /* risk-low  → deep green */
+  --accent-neon-yellow: #C5A028;  /* risk-mid  → gold */
+  --accent-neon-orange: #7A1515;  /* risk-high → crimson */
+  --status-good:        #1A5C2E;
+  --status-warning:     #C5A028;
+  --status-alert:       #7A1515;
+
+  /* ── Shadows ──────────────────────────────────────────────────── */
+  --shadow-noir: none;
+  --shadow-card: none;
 }
 
-/* ── Base ─────────────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+/* ── Reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Times New Roman", Times, serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* ── Custom Utilities: Noir Aesthetic ─────────────────────────────────── */
-.glass-noir {
-  background: rgba(6, 6, 6, 0.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid var(--border-subtle);
+/* ── Typography Override: all display fonts → Times New Roman ─────────── */
+.font-jetbrains,
+.font-outfit {
+  font-family: "Times New Roman", Times, serif;
 }
 
+/* ── Structural Classes ───────────────────────────────────────────────── */
+
+/* Header bar — ivory with 1px navy rule */
+.glass-noir {
+  background: var(--bg-primary);
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--border-accent);
+}
+
+/* Primary card — ivory, sharp 1px navy border */
 .card-noir {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-noir), var(--shadow-card);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  border: 1px solid var(--border-accent);
+  box-shadow: none;
+  border-radius: 0 !important;
+  transition: border-color 0.15s ease;
 }
-
 .card-noir:hover {
-  border-color: var(--border-accent);
-  background: #111111;
+  border-color: var(--border-hover);
+  background: var(--bg-card);
 }
 
+/* Recessed surface card */
 .card-flat {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  border-radius: 0 !important;
+  transition: border-color 0.15s ease;
 }
-
 .card-flat:hover {
   border-color: var(--border-accent);
 }
 
+/* Gradient text → solid navy */
 .text-gradient-mono {
-  background: linear-gradient(160deg, #fff 0%, #777 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
 }
 
-/* ── Focus Styles ─────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 1px solid var(--border-accent);
-  outline-offset: 2px;
-}
-
-/* ── Animations ───────────────────────────────────────────────────────── */
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes neon-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes progress-bar {
-  0%   { width: 0%; }
-  60%  { width: 75%; }
-  80%  { width: 82%; }
-  100% { width: 92%; }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position:  200% center; }
-}
-
-@keyframes step-in {
-  from { opacity: 0; transform: translateX(-8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease both;
-}
-
-.animate-neon-pulse {
-  animation: neon-pulse 2.4s ease-in-out infinite;
-}
-
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-
-.animate-progress-bar {
-  animation: progress-bar 10s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2.4s infinite;
-}
-
-/* ── Typography helpers ───────────────────────────────────────────────── */
-.font-jetbrains { font-family: 'JetBrains Mono', monospace; }
-.font-outfit    { font-family: 'Outfit', sans-serif; }
-
-/* ── Label style ──────────────────────────────────────────────────────── */
+/* ── Micro-label ─────────────────────────────────────────────────────── */
 .label-xs {
+  font-family: "Times New Roman", Times, serif;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-/* ── Scrollbar ────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 2px;
+/* ── Focus ────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 1px solid var(--accent-gold);
+  outline-offset: 1px;
 }
-::-webkit-scrollbar-thumb:hover { background: #333; }
 
-/* ── Sidebar divider ──────────────────────────────────────────────────── */
-.sidebar-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border-subtle);
-  margin: 20px 0;
+/* ── Animations — functional only, no glow ────────────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Subtle pulse — used for live indicator */
+@keyframes institution-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+@keyframes spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes progress-bar {
+  0%   { width: 0%; }
+  60%  { width: 72%; }
+  80%  { width: 81%; }
+  100% { width: 91%; }
+}
+
+.animate-fade-in-up   { animation: fade-in-up 0.4s ease both; }
+.animate-fade-in      { animation: fade-in 0.3s ease both; }
+.animate-neon-pulse   { animation: institution-pulse 2.4s ease-in-out infinite; }
+.animate-spin-slow    { animation: spin-cw 2.4s linear infinite; }
+.animate-progress-bar { animation: progress-bar 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+/* ── Scrollbar — ivory/navy ───────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Recharts axis ticks: inherit navy ────────────────────────────────── */
+.recharts-cartesian-axis-tick text,
+.recharts-polar-angle-axis-tick text {
+  font-family: "Times New Roman", Times, serif !important;
+  fill: var(--text-muted) !important;
 }

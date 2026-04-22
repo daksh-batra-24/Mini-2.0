@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 
+const NAVY  = '#0B1D3A';
+const GOLD  = '#C5A028';
+const FONT  = '"Times New Roman", Times, serif';
+
 const STEPS = [
-  { label: 'Fetching market data', duration: 1200 },
-  { label: 'Building sliding window', duration: 2200 },
-  { label: 'Computing persistence diagrams', duration: 3800 },
+  { label: 'Fetching market data',         duration: 1200 },
+  { label: 'Building sliding window',      duration: 2400 },
+  { label: 'Computing persistence diagrams', duration: 3900 },
   { label: 'Extracting manifold velocity', duration: 5800 },
-  { label: 'Running ensemble vote', duration: 8000 },
+  { label: 'Running ensemble vote',        duration: 8200 },
 ];
 
 export default function LoadingOverlay() {
@@ -19,62 +23,104 @@ export default function LoadingOverlay() {
   }, []);
 
   return (
-    <div className="w-full max-w-lg mx-auto py-20 flex flex-col items-center animate-fade-in-up">
-
-      {/* Spinner */}
-      <div className="relative w-14 h-14 mb-10">
-        <div className="absolute inset-0 rounded-full border border-white/5" />
-        <div className="absolute inset-0 rounded-full border border-t-white/60 border-l-white/20 border-r-transparent border-b-transparent animate-spin" />
-        <div className="absolute inset-[5px] rounded-full border border-white/5 animate-spin-slow" style={{ animationDirection: 'reverse' }} />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-1.5 h-1.5 rounded-full bg-white animate-neon-pulse shadow-[0_0_8px_white]" />
-        </div>
-      </div>
-
-      {/* Title */}
-      <h3 className="text-xl font-black text-white uppercase tracking-tighter font-outfit mb-1">
-        EXTRACTING_MANIFOLD
-      </h3>
-      <p className="label-xs mb-8">TDA Pipeline · ~10s latency</p>
-
-      {/* Progress bar */}
-      <div className="w-full h-px mb-8 relative" style={{ background: 'var(--border-subtle)' }}>
+    <div
+      style={{
+        width: '100%', maxWidth: 520, margin: '0 auto',
+        padding: '64px 0', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        fontFamily: FONT,
+      }}
+      className="animate-fade-in-up"
+    >
+      {/* ── Minimalist navy spinner ─────────────────────────────────── */}
+      <div style={{ position: 'relative', width: 48, height: 48, marginBottom: 36 }}>
+        {/* Static outer square border */}
+        <div style={{ position: 'absolute', inset: 0, border: `1px solid rgba(11,29,58,0.18)` }} />
+        {/* Rotating inner square — 1px navy, no glow */}
         <div
-          className="absolute inset-y-0 left-0 animate-progress-bar"
-          style={{ background: 'var(--text-secondary)', borderRadius: 1 }}
+          className="animate-spin-slow"
+          style={{
+            position: 'absolute', inset: 6,
+            border: `1px solid ${NAVY}`,
+            borderTopColor: 'transparent', borderRightColor: 'transparent',
+          }}
+        />
+        {/* Gold dot center */}
+        <div
+          style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 5, height: 5, background: GOLD,
+          }}
         />
       </div>
 
-      {/* Step list */}
-      <div className="w-full flex flex-col gap-2.5">
+      {/* ── Title ──────────────────────────────────────────────────── */}
+      <h3
+        style={{
+          fontSize: 14, fontWeight: 900, letterSpacing: '0.18em', textTransform: 'uppercase',
+          color: NAVY, marginBottom: 4,
+        }}
+      >
+        Extracting Manifold
+      </h3>
+      <p
+        style={{
+          fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase',
+          color: '#7A8EA8', marginBottom: 28,
+        }}
+      >
+        TDA Pipeline · ~10s Latency
+      </p>
+
+      {/* ── Progress bar ───────────────────────────────────────────── */}
+      <div style={{ width: '100%', height: 1, background: 'rgba(11,29,58,0.12)', marginBottom: 28, position: 'relative' }}>
+        <div
+          className="animate-progress-bar"
+          style={{ position: 'absolute', inset: 0, background: NAVY, right: 'auto' }}
+        />
+      </div>
+
+      {/* ── Step list ──────────────────────────────────────────────── */}
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {STEPS.map((step, i) => {
-          const done = i < activeStep;
+          const done   = i < activeStep;
           const active = i === activeStep;
           return (
             <div
               key={step.label}
-              className="flex items-center gap-3 transition-all duration-300"
-              style={{ opacity: done ? 0.4 : active ? 1 : 0.15 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                opacity: done ? 0.38 : active ? 1 : 0.18,
+                transition: 'opacity 0.4s ease',
+              }}
             >
+              {/* Step indicator */}
               <div
-                className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-all"
                 style={{
-                  borderColor: done ? 'transparent' : active ? 'var(--text-secondary)' : 'var(--border-subtle)',
-                  background: done ? 'var(--border-accent)' : 'transparent',
+                  width: 16, height: 16, flexShrink: 0,
+                  border: `1px solid ${done ? 'transparent' : active ? NAVY : 'rgba(11,29,58,0.30)'}`,
+                  background: done ? 'rgba(11,29,58,0.12)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
                 {done && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg width="9" height="9" fill="none" viewBox="0 0 24 24" stroke={NAVY} strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
                 {active && (
-                  <div className="w-1 h-1 rounded-full bg-white animate-neon-pulse" />
+                  /* Gold square pulse instead of neon dot */
+                  <div className="animate-neon-pulse" style={{ width: 5, height: 5, background: GOLD }} />
                 )}
               </div>
+
+              {/* Label */}
               <span
-                className="text-[11px] font-medium font-jetbrains"
-                style={{ color: done ? 'var(--text-muted)' : active ? 'white' : 'var(--text-muted)' }}
+                style={{
+                  fontSize: 11, fontWeight: done ? 400 : active ? 700 : 400,
+                  color: done ? '#7A8EA8' : active ? NAVY : '#7A8EA8',
+                  letterSpacing: '0.04em',
+                }}
               >
                 {step.label}
               </span>

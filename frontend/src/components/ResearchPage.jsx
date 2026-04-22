@@ -1,189 +1,197 @@
+const NAVY  = '#0B1D3A';
+const GOLD  = '#C5A028';
+const IVORY = '#FDFBF7';
+const FONT  = '"Times New Roman", Times, serif';
+const SURF  = '#F3F1EB';
+
 const PIPELINE_STEPS = [
-  { id: '01', label: 'Raw OHLC', sub: '2-Year Window', icon: '▤' },
-  { id: '02', label: 'Sliding Window', sub: 'Size=20, Stride=1', icon: '⧉' },
-  { id: '03', label: 'Takens Embedding', sub: '3D, τ=1', icon: '⬡' },
-  { id: '04', label: 'Vietoris-Rips', sub: 'H₀, H₁ Homology', icon: '◎' },
-  { id: '05', label: 'Persistence Landscape', sub: '10 bins × 2 dims', icon: '≋' },
-  { id: '06', label: 'Manifold Velocity', sub: 'First Derivative (Δ)', icon: '∂' },
-  { id: '07', label: 'PCA Compression', sub: '40+ → 5 Components', icon: '⊕' },
-  { id: '08', label: 'Ensemble Vote', sub: 'XGB + RF + LR', icon: '⊗' },
+  { id: '01', label: 'Raw OHLC',             sub: '2-Year Window',        icon: '▤' },
+  { id: '02', label: 'Sliding Window',        sub: 'Size=20, Stride=1',   icon: '⧉' },
+  { id: '03', label: 'Takens Embedding',      sub: '3D, τ=1',             icon: '⬡' },
+  { id: '04', label: 'Vietoris-Rips',         sub: 'H₀, H₁ Homology',    icon: '◎' },
+  { id: '05', label: 'Persistence Landscape', sub: '10 bins × 2 dims',    icon: '≋' },
+  { id: '06', label: 'Manifold Velocity',     sub: 'First Derivative (Δ)', icon: '∂' },
+  { id: '07', label: 'PCA Compression',       sub: '40+ → 5 Components',  icon: '⊕' },
+  { id: '08', label: 'Ensemble Vote',         sub: 'XGB + RF + LR',       icon: '⊗' },
 ];
 
 const PERFORMANCE_DATA = [
   { model: 'Baseline (TA Only)', accuracy: '67.4%', f1: '0.383', mcc: '0.172', notes: 'RSI + MACD only' },
-  { model: 'TDA Only', accuracy: '71.2%', f1: '0.421', mcc: '0.238', notes: 'Topology, no TA' },
-  { model: 'Full Ensemble', accuracy: '75.3%', f1: '0.450', mcc: '0.291', notes: 'TDA + TA fusion', highlight: true },
+  { model: 'TDA Only',           accuracy: '71.2%', f1: '0.421', mcc: '0.238', notes: 'Topology, no TA' },
+  { model: 'Full Ensemble',      accuracy: '75.3%', f1: '0.450', mcc: '0.291', notes: 'TDA + TA fusion', highlight: true },
 ];
 
 const PROBLEMS = [
-  {
-    title: 'Euclidean Blindspot',
-    desc: 'Traditional models treat price as a 1D time series, missing multi-dimensional structural topology that precedes crashes.',
-  },
-  {
-    title: 'Class Imbalance',
-    desc: 'Crashes are rare events (<5% of trading days). Standard classifiers are biased toward predicting "safe" at all times.',
-  },
-  {
-    title: 'Regime Drift',
-    desc: 'A model trained on 2020 data will fail in 2024 micro-regimes. Static weights cannot adapt to market phase transitions.',
-  },
+  { title: 'Euclidean Blindspot', desc: 'Traditional models treat price as a 1D time series, missing multi-dimensional structural topology that precedes crashes.' },
+  { title: 'Class Imbalance',    desc: 'Crashes are rare events (<5% of trading days). Standard classifiers are biased toward predicting "safe" at all times.' },
+  { title: 'Regime Drift',       desc: 'A model trained on 2020 data will fail in 2024 micro-regimes. Static weights cannot adapt to market phase transitions.' },
 ];
 
 const TECH_STACK = [
-  { name: 'Giotto-TDA', role: 'Topological Data Analysis' },
-  { name: 'XGBoost', role: 'Gradient Boosting Classifier' },
+  { name: 'Giotto-TDA',   role: 'Topological Data Analysis' },
+  { name: 'XGBoost',      role: 'Gradient Boosting Classifier' },
   { name: 'scikit-learn', role: 'RF + LR + Ensemble Voting' },
-  { name: 'FastAPI', role: 'Async REST Backend' },
-  { name: 'yfinance', role: 'Market Data Fetcher' },
+  { name: 'FastAPI',      role: 'Async REST Backend' },
+  { name: 'yfinance',     role: 'Market Data Fetcher' },
   { name: 'React + Vite', role: 'Frontend Interface' },
 ];
 
 export default function ResearchPage() {
   return (
-    <div className="flex flex-col gap-14 py-6 animate-fade-in-up max-w-4xl">
+    <div
+      style={{ display: 'flex', flexDirection: 'column', gap: 56, paddingTop: 8, fontFamily: FONT }}
+      className="animate-fade-in-up"
+    >
 
-      {/* Hero */}
-      <div className="flex flex-col gap-4">
-        <span className="label-xs tracking-[0.25em]">Academic Research</span>
-        <h1 className="text-4xl font-black text-white uppercase tracking-tighter font-outfit leading-tight">
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, borderBottom: `1px solid rgba(11,29,58,0.12)`, paddingBottom: 32 }}>
+        <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#7A8EA8' }}>
+          Academic Research
+        </p>
+        <h1 style={{ fontSize: 36, fontWeight: 900, color: NAVY, letterSpacing: '0.03em', lineHeight: 1.1 }}>
           Research<br />Methodology
         </h1>
-        <p className="text-sm leading-relaxed max-w-xl" style={{ color: 'var(--text-secondary)' }}>
-          TFRO applies Topological Data Analysis to detect manifold shattering — the geometric precursor
-          to structural market crashes — before they register as price movements.
+        <p style={{ fontSize: 13, color: '#3D5275', maxWidth: 560, lineHeight: 1.8, marginTop: 4 }}>
+          TFRO applies Topological Data Analysis to detect manifold shattering — the geometric
+          precursor to structural market crashes — before they register as price movements.
         </p>
       </div>
 
-      {/* The Problem */}
-      <section>
-        <SectionHeader label="01" title="The Problem" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
+      {/* ── The Problem ──────────────────────────────────────────── */}
+      <Section label="01" title="The Problem">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 1, background: 'rgba(11,29,58,0.15)', marginTop: 20 }}>
           {PROBLEMS.map(p => (
-            <div
-              key={p.title}
-              className="rounded-2xl p-5 border flex flex-col gap-3"
-              style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
-            >
-              <div className="w-5 h-0.5 bg-white opacity-40" />
-              <h3 className="font-black text-white text-sm uppercase tracking-wide">{p.title}</h3>
-              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{p.desc}</p>
+            <div key={p.title} style={{ background: IVORY, padding: '20px 22px' }}>
+              <div style={{ width: 20, height: 2, background: NAVY, marginBottom: 14, opacity: 0.4 }} />
+              <h3 style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: NAVY, marginBottom: 10 }}>
+                {p.title}
+              </h3>
+              <p style={{ fontSize: 12, lineHeight: 1.75, color: '#3D5275' }}>{p.desc}</p>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
-      {/* TDA Pipeline */}
-      <section>
-        <SectionHeader label="02" title="TDA Pipeline" />
-        <p className="text-[12px] mt-2 mb-5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          Instead of treating price as a 1D signal, TFRO projects it into a high-dimensional topological
-          space and measures how fast the manifold is shattering — Manifold Velocity.
+      {/* ── TDA Pipeline ─────────────────────────────────────────── */}
+      <Section label="02" title="TDA Pipeline">
+        <p style={{ fontSize: 12, color: '#3D5275', lineHeight: 1.75, maxWidth: 640, marginTop: 8, marginBottom: 20 }}>
+          Instead of treating price as a 1D signal, TFRO projects it into a high-dimensional
+          topological space and measures how fast the manifold is shattering — Manifold Velocity.
         </p>
-        <div className="flex flex-wrap gap-2 items-center">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
           {PIPELINE_STEPS.map((step, i) => (
-            <div key={step.id} className="flex items-center gap-2">
+            <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div
-                className="rounded-xl p-3.5 flex flex-col gap-1 border"
-                style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)', minWidth: 96 }}
+                style={{
+                  background: SURF, border: `1px solid rgba(11,29,58,0.18)`,
+                  padding: '12px 14px', minWidth: 92,
+                }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-base">{step.icon}</span>
-                  <span className="label-xs">{step.id}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 16 }}>{step.icon}</span>
+                  <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', color: '#7A8EA8' }}>{step.id}</span>
                 </div>
-                <p className="text-[11px] font-bold text-white mt-0.5">{step.label}</p>
-                <p className="text-[9px] font-medium" style={{ color: 'var(--text-muted)' }}>{step.sub}</p>
+                <p style={{ fontSize: 10, fontWeight: 900, color: NAVY, marginBottom: 2 }}>{step.label}</p>
+                <p style={{ fontSize: 8, color: '#7A8EA8' }}>{step.sub}</p>
               </div>
               {i < PIPELINE_STEPS.length - 1 && (
-                <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--text-muted)' }} strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <span style={{ color: 'rgba(11,29,58,0.30)', fontSize: 10, fontWeight: 400 }}>›</span>
               )}
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
-      {/* Manifold Velocity */}
-      <section>
-        <SectionHeader label="03" title="Manifold Velocity" />
+      {/* ── Manifold Velocity ────────────────────────────────────── */}
+      <Section label="03" title="Manifold Velocity">
         <div
-          className="mt-5 rounded-2xl p-7 border flex flex-col gap-6"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+          style={{ background: SURF, border: `1px solid rgba(11,29,58,0.15)`, padding: '24px 28px', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 20 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             <div>
-              <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2.5">The Innovation</h3>
-              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              <h3 style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.20em', textTransform: 'uppercase', color: NAVY, marginBottom: 10 }}>
+                The Innovation
+              </h3>
+              <p style={{ fontSize: 12, lineHeight: 1.8, color: '#3D5275' }}>
                 Standard TDA extracts static topological features. TFRO computes their{' '}
-                <strong className="text-white font-bold">first derivative</strong> — how fast the topology is changing.
-                A market approaching a crash has{' '}
-                <em style={{ color: 'var(--accent-neon-orange)' }}>rapidly shattering topology</em>.
+                <strong style={{ color: NAVY }}>first derivative</strong> — how fast the topology is changing.
+                A market approaching a crash exhibits{' '}
+                <em style={{ color: '#7A1515' }}>rapidly shattering topology</em>.
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2.5">Why It Works</h3>
-              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                The 40+ raw TDA features are compressed via PCA to 5 principal components.
-                This prevents overfitting on 2-year datasets (~500 rows) while retaining maximum topological signal.
+              <h3 style={{ fontSize: 10, fontWeight: 900, letterSpacing: '0.20em', textTransform: 'uppercase', color: NAVY, marginBottom: 10 }}>
+                Why It Works
+              </h3>
+              <p style={{ fontSize: 12, lineHeight: 1.8, color: '#3D5275' }}>
+                The 40+ raw TDA features are compressed via PCA to 5 principal components,
+                preventing overfitting on 2-year datasets (~500 rows) while retaining maximum topological signal.
               </p>
             </div>
           </div>
-          <div className="pt-5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
-            <code className="text-[11px] font-jetbrains" style={{ color: 'var(--accent-neon-green)' }}>
-              Δ(landscape) = landscape[t] − landscape[t-1] → PCA(hstack(landscape, Δ), n=5) → fuse(X_tda, X_ta)
+          <div style={{ borderTop: `1px solid rgba(11,29,58,0.12)`, paddingTop: 16 }}>
+            <code style={{ fontSize: 11, color: '#1A5C2E', fontFamily: FONT }}>
+              Δ(landscape) = landscape[t] − landscape[t−1] → PCA(hstack(landscape, Δ), n=5) → fuse(X_tda, X_ta)
             </code>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* Ensemble Architecture */}
-      <section>
-        <SectionHeader label="04" title="Ensemble Architecture" />
-        <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* ── Ensemble Architecture ────────────────────────────────── */}
+      <Section label="04" title="Ensemble Architecture">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 1, background: 'rgba(11,29,58,0.15)', marginTop: 16 }}>
           {[
-            { name: 'XGBoost', role: 'Non-linear specialist', desc: 'Captures complex topological shattering signals with √pos_ratio sample weighting.', accent: 'var(--accent-neon-green)', hex: '#00ff88' },
-            { name: 'Random Forest', role: 'Variance reducer', desc: 'Bagging-based hedge against overfitting on small regime-specific datasets.', accent: 'var(--accent-neon-yellow)', hex: '#ffdd00' },
-            { name: 'Logistic Regression', role: 'Linear baseline', desc: 'Keeps the ensemble grounded when non-linear models diverge from true trend.', accent: 'var(--accent-neon-orange)', hex: '#ff5500' },
+            { name: 'XGBoost',             role: 'Non-linear specialist', accent: '#1A5C2E',
+              desc: 'Captures complex topological shattering signals with √pos_ratio sample weighting.' },
+            { name: 'Random Forest',        role: 'Variance reducer',      accent: GOLD,
+              desc: 'Bagging-based hedge against overfitting on small regime-specific datasets.' },
+            { name: 'Logistic Regression',  role: 'Linear baseline',        accent: '#3D5275',
+              desc: 'Keeps the ensemble grounded when non-linear models diverge from trend.' },
           ].map(m => (
-            <div
-              key={m.name}
-              className="rounded-2xl p-5 border flex flex-col gap-3 relative overflow-hidden"
-              style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
-            >
-              <div className="absolute top-0 left-0 right-0 h-px" style={{ background: m.accent, opacity: 0.6 }} />
-              <div>
-                <h3 className="font-black text-white text-sm uppercase tracking-wide">{m.name}</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest mt-0.5" style={{ color: m.accent }}>{m.role}</p>
-              </div>
-              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{m.desc}</p>
+            <div key={m.name} style={{ background: IVORY, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
+              {/* Top accent rule */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: m.accent }} />
+              <h3 style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.14em', color: NAVY, marginBottom: 4, marginTop: 8 }}>
+                {m.name}
+              </h3>
+              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: m.accent, marginBottom: 10 }}>
+                {m.role}
+              </p>
+              <p style={{ fontSize: 12, lineHeight: 1.75, color: '#3D5275' }}>{m.desc}</p>
             </div>
           ))}
         </div>
-        <div
-          className="mt-3 p-4 rounded-xl border"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
-        >
-          <p className="label-xs mb-1.5">Voting Strategy</p>
-          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            <strong className="text-white font-semibold">Soft voting</strong> — averages class probabilities across all three estimators.
+        <div style={{ background: SURF, border: `1px solid rgba(11,29,58,0.15)`, padding: '14px 18px', marginTop: 2 }}>
+          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7A8EA8', marginBottom: 6 }}>
+            Voting Strategy
+          </p>
+          <p style={{ fontSize: 12, lineHeight: 1.75, color: '#3D5275' }}>
+            <strong style={{ color: NAVY }}>Soft voting</strong> — averages class probabilities across all three estimators.
             The final crash probability is a balanced signal, not a majority-rules vote.
           </p>
         </div>
-      </section>
+      </Section>
 
-      {/* Performance */}
-      <section>
-        <SectionHeader label="05" title="Ablation Study" />
-        <p className="text-[12px] mt-2 mb-5" style={{ color: 'var(--text-secondary)' }}>
+      {/* ── Ablation Study ───────────────────────────────────────── */}
+      <Section label="05" title="Ablation Study">
+        <p style={{ fontSize: 12, color: '#3D5275', marginTop: 8, marginBottom: 16 }}>
           Evaluated on MSFT 2-year dataset, chronological 80/20 split. No data leakage.
         </p>
-        <div className="card-noir rounded-2xl overflow-hidden">
-          <table className="w-full">
+        <div style={{ border: `1px solid rgba(11,29,58,0.25)` }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FONT }}>
             <thead>
-              <tr className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+              <tr style={{ background: SURF, borderBottom: `1px solid rgba(11,29,58,0.20)` }}>
                 {['Model', 'Accuracy', 'F1-Score', 'MCC', 'Notes'].map(h => (
-                  <th key={h} className="px-5 py-3.5 text-left label-xs">{h}</th>
+                  <th
+                    key={h}
+                    style={{
+                      padding: '10px 16px', textAlign: 'left',
+                      fontSize: 9, fontWeight: 700, letterSpacing: '0.20em', textTransform: 'uppercase',
+                      color: '#7A8EA8', fontFamily: FONT,
+                    }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -191,80 +199,80 @@ export default function ResearchPage() {
               {PERFORMANCE_DATA.map(row => (
                 <tr
                   key={row.model}
-                  className="border-b last:border-0 transition-colors"
                   style={{
-                    borderColor: 'var(--border-subtle)',
-                    background: row.highlight ? 'rgba(255,255,255,0.02)' : 'transparent',
+                    background: row.highlight ? 'rgba(197,160,40,0.06)' : IVORY,
+                    borderBottom: `1px solid rgba(11,29,58,0.10)`,
                   }}
                 >
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[12px] font-semibold ${row.highlight ? 'text-white' : ''}`} style={!row.highlight ? { color: 'var(--text-secondary)' } : {}}>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 12, fontWeight: row.highlight ? 900 : 600, color: row.highlight ? NAVY : '#3D5275' }}>
                         {row.model}
                       </span>
                       {row.highlight && (
-                        <span
-                          className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded border"
-                          style={{ color: 'var(--accent-neon-green)', borderColor: 'var(--accent-neon-green)' }}
-                        >
+                        <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', border: `1px solid ${GOLD}`, color: GOLD, padding: '1px 6px' }}>
                           Best
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-[12px] font-black font-jetbrains text-white">{row.accuracy}</td>
-                  <td className="px-5 py-4 text-[12px] font-jetbrains" style={{ color: 'var(--text-secondary)' }}>{row.f1}</td>
-                  <td className="px-5 py-4 text-[12px] font-jetbrains" style={{ color: 'var(--text-secondary)' }}>{row.mcc}</td>
-                  <td className="px-5 py-4 text-[11px]" style={{ color: 'var(--text-muted)' }}>{row.notes}</td>
+                  <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 900, color: NAVY }}>{row.accuracy}</td>
+                  <td style={{ padding: '12px 16px', fontSize: 12, color: '#3D5275' }}>{row.f1}</td>
+                  <td style={{ padding: '12px 16px', fontSize: 12, color: '#3D5275' }}>{row.mcc}</td>
+                  <td style={{ padding: '12px 16px', fontSize: 11, color: '#7A8EA8' }}>{row.notes}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div
-          className="mt-3 p-4 rounded-xl border"
-          style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
-        >
-          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            <strong className="text-white font-semibold">MCC (Matthews Correlation Coefficient)</strong> is used as the primary metric
+        <div style={{ background: SURF, border: `1px solid rgba(11,29,58,0.15)`, padding: '14px 18px', marginTop: 2 }}>
+          <p style={{ fontSize: 12, lineHeight: 1.75, color: '#3D5275' }}>
+            <strong style={{ color: NAVY }}>MCC (Matthews Correlation Coefficient)</strong> is used as the primary metric
             because it accounts for class imbalance more honestly than accuracy or F1.
             A random classifier scores 0; a perfect classifier scores 1.
           </p>
         </div>
-      </section>
+      </Section>
 
-      {/* Tech Stack */}
-      <section>
-        <SectionHeader label="06" title="Technology Stack" />
-        <div className="mt-5 grid grid-cols-2 md:grid-cols-3 gap-2.5">
+      {/* ── Technology Stack ─────────────────────────────────────── */}
+      <Section label="06" title="Technology Stack">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 1, background: 'rgba(11,29,58,0.15)', marginTop: 16 }}>
           {TECH_STACK.map(t => (
             <div
               key={t.name}
-              className="flex items-center gap-3 p-4 rounded-xl border transition-colors"
-              style={{ borderColor: 'var(--border-subtle)' }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+              style={{
+                background: IVORY, padding: '14px 18px',
+                display: 'flex', alignItems: 'center', gap: 12,
+              }}
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-white opacity-40 flex-shrink-0" />
+              <div style={{ width: 4, height: 4, background: NAVY, flexShrink: 0, opacity: 0.4 }} />
               <div>
-                <p className="text-[12px] font-bold text-white">{t.name}</p>
-                <p className="text-[10px] mt-0.5 font-medium" style={{ color: 'var(--text-muted)' }}>{t.role}</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: NAVY }}>{t.name}</p>
+                <p style={{ fontSize: 10, color: '#7A8EA8', marginTop: 2 }}>{t.role}</p>
               </div>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
     </div>
   );
 }
 
-function SectionHeader({ label, title }) {
+/* Section header component */
+function Section({ label, title, children }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="label-xs font-jetbrains opacity-60">{label}</span>
-      <div className="w-px h-4" style={{ background: 'var(--border-accent)' }} />
-      <h2 className="text-lg font-black text-white uppercase tracking-tight font-outfit">{title}</h2>
-    </div>
+    <section style={{ fontFamily: FONT }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: '#7A8EA8', fontFamily: FONT }}>
+          {label}
+        </span>
+        <div style={{ width: 1, height: 16, background: 'rgba(11,29,58,0.25)' }} />
+        <h2 style={{ fontSize: 17, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.10em', color: NAVY }}>
+          {title}
+        </h2>
+      </div>
+      {children}
+    </section>
   );
 }

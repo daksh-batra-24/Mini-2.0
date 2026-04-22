@@ -1,107 +1,107 @@
+const NAVY  = '#0B1D3A';
+const GOLD  = '#C5A028';
+const FONT  = '"Times New Roman", Times, serif';
+
+/* Risk threshold → institutional color */
+function riskPalette(score) {
+  if (score < 40) return { color: '#1A5C2E', label: 'SAFE' };
+  if (score < 70) return { color: GOLD,      label: 'VOLATILE' };
+  return               { color: '#7A1515',   label: 'IMMINENT' };
+}
+
 export default function RiskGauge({ score }) {
-  const r = 42;
+  const r             = 42;
   const circumference = r * 2 * Math.PI;
-  const dashOffset = circumference - (score / 100) * circumference;
+  const dashOffset    = circumference - (score / 100) * circumference;
+  const palette       = riskPalette(score);
 
-  const getNeonColor = () => {
-    if (score < 40) return 'var(--accent-neon-green)';
-    if (score < 70) return 'var(--accent-neon-yellow)';
-    return 'var(--accent-neon-orange)';
-  };
-
-  const getHex = () => {
-    if (score < 40) return '#00ff88';
-    if (score < 70) return '#ffdd00';
-    return '#ff5500';
-  };
-
-  const getLabel = () => {
-    if (score < 40) return 'SAFE';
-    if (score < 70) return 'VOLATILE';
-    return 'IMMINENT';
-  };
-
-  const color = getNeonColor();
-  const hex = getHex();
-
-  /* Tick marks at 0, 40, 70, 100 — mapped to angle (full circle, starting top -90deg) */
-  const thresholds = [0, 40, 70, 100];
-  const ticks = thresholds.map((pct) => {
-    const angle = (pct / 100) * 360 - 90; // -90 so 0 starts at top
-    const rad = (angle * Math.PI) / 180;
-    const innerR = 48;
-    const outerR = 51;
+  /* Tick marks at threshold boundaries: 0, 40, 70, 100 */
+  const ticks = [0, 40, 70, 100].map((pct) => {
+    const angle = (pct / 100) * 360 - 90;
+    const rad   = (angle * Math.PI) / 180;
     return {
-      x1: 50 + innerR * Math.cos(rad),
-      y1: 50 + innerR * Math.sin(rad),
-      x2: 50 + outerR * Math.cos(rad),
-      y2: 50 + outerR * Math.sin(rad),
+      x1: 50 + 47 * Math.cos(rad),
+      y1: 50 + 47 * Math.sin(rad),
+      x2: 50 + 51 * Math.cos(rad),
+      y2: 50 + 51 * Math.sin(rad),
     };
   });
 
   return (
-    <div className="flex flex-col items-center gap-5">
-      <div className="relative w-56 h-56 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-          <defs>
-            <filter id="gaugeGlow" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, fontFamily: FONT }}>
 
-          {/* Outer decorative ring */}
-          <circle cx="50" cy="50" r="49" stroke="#0d0d0d" strokeWidth="1" fill="none" />
+      {/* SVG Gauge */}
+      <div style={{ position: 'relative', width: 220, height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg
+          style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}
+          viewBox="0 0 100 100"
+        >
+          {/* Outer boundary ring — fine navy line */}
+          <circle cx="50" cy="50" r="49" stroke={NAVY} strokeWidth="0.4" fill="none" strokeOpacity="0.2" />
 
-          {/* Track */}
-          <circle cx="50" cy="50" r={r} stroke="#181818" strokeWidth="7" fill="none" />
-
-          {/* Active arc */}
+          {/* Track — light navy */}
           <circle
-            cx="50"
-            cy="50"
-            r={r}
-            stroke={hex}
-            strokeWidth="7"
+            cx="50" cy="50" r={r}
+            stroke={NAVY} strokeWidth="6"
+            fill="none" strokeOpacity="0.10"
+          />
+
+          {/* Gold progress arc */}
+          <circle
+            cx="50" cy="50" r={r}
+            stroke={GOLD}
+            strokeWidth="6"
             fill="none"
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}
             strokeLinecap="butt"
-            filter="url(#gaugeGlow)"
-            className="transition-all duration-1000 ease-out"
+            style={{ transition: 'stroke-dashoffset 1s ease-out' }}
           />
 
           {/* Threshold tick marks */}
           {ticks.map((t, i) => (
             <line
               key={i}
-              x1={t.x1} y1={t.y1}
-              x2={t.x2} y2={t.y2}
-              stroke="#2a2a2a"
-              strokeWidth="1"
-              strokeLinecap="round"
+              x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
+              stroke={NAVY} strokeWidth="0.8" strokeOpacity="0.35"
             />
           ))}
         </svg>
 
-        {/* Center labels */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
-          <p className="label-xs mb-2 tracking-[0.25em]">Risk Score</p>
-          <p className="text-6xl font-black text-white leading-none font-outfit">{score}</p>
+        {/* Center content */}
+        <div
+          style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            fontFamily: FONT,
+          }}
+        >
+          <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7A8EA8', marginBottom: 4 }}>
+            Risk Score
+          </p>
+          <p style={{ fontSize: 54, fontWeight: 900, color: NAVY, lineHeight: 1 }}>
+            {score}
+          </p>
+          {/* Risk label badge */}
           <div
-            className="mt-3 px-3 py-0.5 rounded border text-[10px] font-black uppercase tracking-[0.18em] animate-neon-pulse"
-            style={{ color, borderColor: color, boxShadow: `0 0 8px ${hex}22` }}
+            className="animate-neon-pulse"
+            style={{
+              marginTop: 8,
+              padding: '2px 10px',
+              border: `1px solid ${palette.color}`,
+              fontSize: 8, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: palette.color, fontFamily: FONT,
+            }}
           >
-            {getLabel()}
+            {palette.label}
           </div>
         </div>
       </div>
 
-      {/* Sub-label */}
-      <p className="label-xs tracking-[0.25em] opacity-40 text-center">Manifold Shattering Coefficient</p>
+      {/* Sub-caption */}
+      <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7A8EA8', opacity: 0.7 }}>
+        Manifold Shattering Coefficient
+      </p>
     </div>
   );
 }
