@@ -48,9 +48,10 @@ class RiskResponse(BaseModel):
     risk_level: str
     recommendation: str
     historical_accuracy_pct: float
+    features: dict = {}
 
 app = FastAPI(title="Stock Risk Dashboard API")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 def fetch_data_robust(ticker: str, period: str = "2y") -> pd.DataFrame:
     """Robust global data fetcher. Defaulting to 2y for dynamic model training."""
@@ -220,6 +221,16 @@ async def predict_risk(ticker: str):
     risk_score = int(round(drawdown_prob * 100))
     risk_level, rec = classify_risk(risk_score)
 
+    # Extract latest TA feature values for frontend display
+    latest_ta = df_aligned.iloc[-1]
+    features_dict = {
+        "RSI": round(float(latest_ta['RSI']), 1),
+        "MACD": round(float(latest_ta['MACD']), 6),
+        "BB_Width": round(float(latest_ta['BB_Width']), 6),
+        "BB_Pivot": round(float(latest_ta['BB_Pivot']), 6),
+        "ATR": round(float(latest_ta['ATR']), 2),
+    }
+
     return RiskResponse(
         ticker=ticker.upper(),
         current_price=round(current_price, 2),
@@ -227,4 +238,28 @@ async def predict_risk(ticker: str):
         risk_level=risk_level,
         recommendation=rec,
         historical_accuracy_pct=hist_acc,
+        features=features_dict,
     )
+
+
+@app.get("/history/{ticker}")
+async def get_history(ticker: str):
+    """Returns last 60 trading days of OHLC price data for charting."""
+    df = fetch_data_robust(ticker.upper(), period="3mo")
+    if df.empty or len(df) < 10:
+        raise HTTPException(status_code=404, detail="No price history available for this ticker.")
+    df_recent = df.tail(60)
+    history = []
+    for idx, row in df_recent.iterrows():
+        try:
+            date_str = idx.strftime("%b %d")
+        except Exception:
+            date_str = str(idx)[:10]
+        history.append({
+            "date": date_str,
+            "open": round(float(row['Open']), 2),
+            "high": round(float(row['High']), 2),
+            "low": round(float(row['Low']), 2),
+            "close": round(float(row['Close']), 2),
+        })
+    return {"ticker": ticker.upper(), "data": history}

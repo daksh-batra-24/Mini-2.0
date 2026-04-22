@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l \"D:\\\\project\\\\Topological-Financial-Risk-Optimizer\\\\frontend\\\\src\"/*.jsx)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
