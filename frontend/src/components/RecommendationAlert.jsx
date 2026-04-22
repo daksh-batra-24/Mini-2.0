@@ -1,10 +1,6 @@
-/**
- * RecommendationAlert — System verdict with ATR-based risk metrics.
- */
 export default function RecommendationAlert({
   riskLevel,
   recommendation,
-  ticker,
   currentPrice,
   features = {},
 }) {
@@ -19,22 +15,18 @@ export default function RecommendationAlert({
 
   const theme = getTheme();
 
-  // ATR-based stop loss (2x ATR below current price)
   const atr = features?.ATR || 0;
-  const stopLossPrice = atr > 0 ? (currentPrice - atr * 2.0) : null;
-  const stopLossPct = atr > 0 ? ((atr * 2.0) / currentPrice * 100).toFixed(2) : '2.50';
-
-  // Position sizing: risk 1% of portfolio per trade (Kelly-lite)
+  const stopLossPrice = atr > 0 ? currentPrice - atr * 2 : null;
+  const stopLossPct = atr > 0 ? ((atr * 2) / currentPrice * 100).toFixed(2) : '2.50';
   const positionPct = atr > 0
-    ? Math.min(100, (1 / parseFloat(stopLossPct) * 100)).toFixed(1)
+    ? Math.min(100, 1 / parseFloat(stopLossPct) * 100).toFixed(1)
     : null;
 
-  // RSI-based context label
   const rsi = features?.RSI;
   const rsiContext = rsi != null
-    ? rsi > 70 ? `Overbought (RSI ${rsi.toFixed(0)}) — momentum exhaustion`
-    : rsi < 30 ? `Oversold (RSI ${rsi.toFixed(0)}) — potential reversal zone`
-    : `Neutral momentum (RSI ${rsi.toFixed(0)})`
+    ? rsi > 70 ? `Overbought — RSI ${rsi.toFixed(0)}, momentum exhaustion`
+    : rsi < 30 ? `Oversold — RSI ${rsi.toFixed(0)}, potential reversal zone`
+    : `Neutral momentum — RSI ${rsi.toFixed(0)}`
     : null;
 
   const bbPivot = features?.BB_Pivot;
@@ -45,54 +37,59 @@ export default function RecommendationAlert({
     : 'N/A';
 
   return (
-    <div className="w-full flex flex-col gap-8">
-      {/* Price + Risk Level header */}
-      <div className="flex items-end justify-between border-b border-white/5 pb-8">
+    <div className="w-full flex flex-col gap-7">
+
+      {/* Price + risk badge */}
+      <div className="flex items-end justify-between">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-[var(--text-muted)] mb-3">Live Valuation</p>
-          <p className="text-5xl font-black text-white font-outfit tracking-tighter">
+          <p className="label-xs mb-2">Live Valuation</p>
+          <p className="text-5xl font-black text-white font-outfit tracking-tighter leading-none">
             ${currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           {rsiContext && (
-            <p className="text-[10px] text-[var(--text-muted)] mt-2 font-medium">{rsiContext}</p>
+            <p className="text-[11px] mt-2 font-medium" style={{ color: 'var(--text-secondary)' }}>{rsiContext}</p>
           )}
         </div>
         <div
-          className="px-6 py-3 rounded-xl border-2 font-black text-sm uppercase tracking-widest"
-          style={{ borderColor: theme.color, color: theme.color, boxShadow: `0 0 25px ${theme.hex}22` }}
+          className="px-5 py-2.5 rounded-xl border font-bold text-[11px] uppercase tracking-widest flex-shrink-0"
+          style={{ borderColor: theme.color, color: theme.color, boxShadow: `0 0 18px ${theme.hex}18` }}
         >
           {riskLevel}
         </div>
       </div>
 
       {/* Verdict card */}
-      <div className="bg-[var(--bg-surface)] rounded-3xl p-8 border border-white/5 relative overflow-hidden">
+      <div
+        className="rounded-2xl p-6 border relative overflow-hidden"
+        style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+      >
+        {/* Accent strip */}
         <div
-          className="absolute top-0 left-0 w-1.5 h-full"
-          style={{ backgroundColor: theme.color, boxShadow: `0 0 20px ${theme.hex}` }}
+          className="absolute inset-y-0 left-0 w-[3px] rounded-l-2xl"
+          style={{ background: theme.color, boxShadow: `0 0 16px ${theme.hex}` }}
         />
-        <div className="flex flex-col gap-3 pl-2">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-muted)]">{theme.label}</span>
-          <h3 className="text-xl font-black text-white uppercase italic tracking-tight font-outfit">
+        <div className="pl-5">
+          <p className="label-xs mb-1.5" style={{ color: theme.color }}>{theme.label}</p>
+          <h3 className="text-base font-black text-white uppercase tracking-tight font-outfit mb-2">
             System Recommendation
           </h3>
-          <p className="text-base leading-relaxed text-[var(--text-secondary)] font-medium">
+          <p className="text-sm leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
             {recommendation}
           </p>
         </div>
       </div>
 
-      {/* Execution metrics grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Execution metrics */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <MetricTile
           label="Stop-Loss"
           value={stopLossPrice != null
             ? `$${stopLossPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             : 'N/A'}
-          sub={`−${stopLossPct}% (2× ATR)`}
+          sub={`−${stopLossPct}% · 2× ATR`}
         />
         <MetricTile
-          label="ATR (14D)"
+          label="ATR 14D"
           value={atr > 0 ? `$${atr.toFixed(2)}` : 'N/A'}
           sub="Avg True Range"
         />
@@ -113,10 +110,15 @@ export default function RecommendationAlert({
 
 function MetricTile({ label, value, sub }) {
   return (
-    <div className="p-5 rounded-2xl border border-white/5 bg-black/40 hover:bg-black/60 transition-colors flex flex-col gap-1.5">
-      <p className="text-[9px] font-black uppercase text-[var(--text-muted)] tracking-widest">{label}</p>
-      <p className="text-sm font-black text-white font-jetbrains">{value}</p>
-      <p className="text-[9px] text-[var(--text-muted)]">{sub}</p>
+    <div
+      className="p-4 rounded-xl border flex flex-col gap-1 transition-colors group cursor-default"
+      style={{ background: 'rgba(0,0,0,0.3)', borderColor: 'var(--border-subtle)' }}
+      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
+      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+    >
+      <p className="label-xs">{label}</p>
+      <p className="text-sm font-black text-white font-jetbrains mt-0.5">{value}</p>
+      <p className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>{sub}</p>
     </div>
   );
 }

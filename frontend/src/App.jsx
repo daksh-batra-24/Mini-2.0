@@ -9,7 +9,8 @@ import { WatchlistPanel, HistoryPanel } from './components/Watchlist';
 import ResearchPage from './components/ResearchPage';
 import './App.css';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+const HEADER_H = 60;
 
 function generateMockPriceData(currentPrice, days = 60) {
   const data = [];
@@ -40,8 +41,6 @@ function loadFromStorage(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
   catch { return fallback; }
 }
-
-const HEADER_H = 65;
 
 export default function App() {
   const [page, setPage] = useState('home');
@@ -135,28 +134,33 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-primary)]">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
+      {/* ── Header ───────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 glass-noir" style={{ height: HEADER_H }}>
         <div className="h-full max-w-[1400px] mx-auto px-5 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg border-2 border-white flex items-center justify-center shadow-[0_0_12px_rgba(255,255,255,0.25)]">
-              <div className="flex gap-0.5">
-                <div className="w-[3px] h-3.5 bg-white rounded-full transform -rotate-12" />
-                <div className="w-[3px] h-3.5 bg-white rounded-full transform rotate-12" />
-              </div>
+          <div className="flex items-center gap-3 flex-shrink-0 select-none">
+            <div
+              className="w-7 h-7 rounded-lg border flex items-center justify-center"
+              style={{ borderColor: 'var(--border-accent)' }}
+            >
+              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
             </div>
             <div>
-              <h1 className="text-base font-black text-white tracking-tighter uppercase font-outfit leading-none">TFRO</h1>
-              <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Risk Optimizer</p>
+              <h1 className="text-sm font-black text-white tracking-tight uppercase font-outfit leading-none">TFRO</h1>
+              <p className="text-[9px] font-medium uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Risk Optimizer</p>
             </div>
           </div>
 
-          {/* Nav tabs */}
-          <nav className="hidden sm:flex items-center gap-1 bg-[var(--bg-surface)] rounded-xl p-1 border border-[var(--border-subtle)]">
+          {/* Nav */}
+          <nav
+            className="hidden sm:flex items-center gap-0.5 rounded-xl p-1 border"
+            style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+          >
             {[
               { id: 'home', label: 'Dashboard' },
               { id: 'research', label: 'Research' },
@@ -164,8 +168,10 @@ export default function App() {
               <button
                 key={id}
                 onClick={() => setPage(id)}
-                className={`px-4 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
-                  page === id ? 'bg-white text-black' : 'text-[var(--text-secondary)] hover:text-white'
+                className={`px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all ${
+                  page === id
+                    ? 'bg-white text-black'
+                    : 'text-[var(--text-secondary)] hover:text-white'
                 }`}
               >
                 {label}
@@ -175,16 +181,27 @@ export default function App() {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-neon-green)] animate-neon-pulse shadow-[0_0_6px_var(--accent-neon-green)]" />
-              <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-[var(--accent-neon-green)]">Engine Live</span>
+              <div
+                className="w-1.5 h-1.5 rounded-full animate-neon-pulse"
+                style={{
+                  background: 'var(--accent-neon-green)',
+                  boxShadow: '0 0 6px var(--accent-neon-green)',
+                }}
+              />
+              <span
+                className="text-[9px] uppercase tracking-[0.2em] font-bold"
+                style={{ color: 'var(--accent-neon-green)' }}
+              >
+                Engine Live
+              </span>
             </div>
-            {/* Mobile sidebar toggle */}
             <button
-              className="lg:hidden px-3 py-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-white transition-colors"
+              className="lg:hidden p-2 rounded-xl border transition-colors"
+              style={{ borderColor: 'var(--border-subtle)' }}
               onClick={() => setMobileSidebarOpen(v => !v)}
-              aria-label="Toggle watchlist"
+              aria-label="Toggle sidebar"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-secondary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -192,33 +209,40 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── Body ───────────────────────────────────────────────────────── */}
+      {/* ── Body ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
 
         {/* Mobile overlay */}
         {mobileSidebarOpen && (
           <div
-            className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/70 lg:hidden backdrop-blur-sm"
             onClick={() => setMobileSidebarOpen(false)}
           />
         )}
 
-        {/* ── Sidebar ────────────────────────────────────────────────── */}
+        {/* ── Sidebar ──────────────────────────────────────────────────── */}
         <aside
           className={`
-            flex-col w-64 flex-shrink-0 border-r border-[var(--border-subtle)] p-5 gap-0
+            flex-col w-60 flex-shrink-0 border-r p-5 gap-0
             sticky overflow-y-auto
             lg:flex
             ${mobileSidebarOpen
-              ? 'flex fixed z-40 bg-[var(--bg-primary)] w-72 shadow-2xl'
+              ? 'flex fixed z-40 w-72 shadow-2xl'
               : 'hidden'}
           `}
-          style={{ top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
+          style={{
+            top: HEADER_H,
+            height: `calc(100vh - ${HEADER_H}px)`,
+            background: mobileSidebarOpen ? 'var(--bg-primary)' : 'transparent',
+            borderColor: 'var(--border-subtle)',
+          }}
         >
           {mobileSidebarOpen && (
             <button
-              className="self-end mb-4 text-[var(--text-muted)] hover:text-white transition-colors"
+              className="self-end mb-4 transition-colors"
+              style={{ color: 'var(--text-muted)' }}
               onClick={() => setMobileSidebarOpen(false)}
+              aria-label="Close sidebar"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -236,14 +260,17 @@ export default function App() {
             onSelect={(t) => { handleSearch(t); setMobileSidebarOpen(false); }}
           />
 
-          {/* Mobile nav links */}
-          <div className="sm:hidden mt-auto pt-6 border-t border-[var(--border-subtle)] flex flex-col gap-2">
+          {/* Mobile nav */}
+          <div
+            className="sm:hidden mt-auto pt-5 border-t flex flex-col gap-1"
+            style={{ borderColor: 'var(--border-subtle)' }}
+          >
             {[{ id: 'home', label: 'Dashboard' }, { id: 'research', label: 'Research' }].map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => { setPage(id); setMobileSidebarOpen(false); }}
-                className={`text-left px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors ${
-                  page === id ? 'bg-white/10 text-white' : 'text-[var(--text-secondary)] hover:text-white'
+                className={`text-left px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors ${
+                  page === id ? 'text-white bg-white/8' : 'text-[var(--text-secondary)] hover:text-white'
                 }`}
               >
                 {label}
@@ -252,67 +279,74 @@ export default function App() {
           </div>
         </aside>
 
-        {/* ── Main Panel ─────────────────────────────────────────────── */}
-        <main className="flex-1 min-w-0 px-5 lg:px-8 py-8">
+        {/* ── Main Panel ───────────────────────────────────────────────── */}
+        <main className="flex-1 min-w-0 px-5 lg:px-10 py-10">
 
-          {/* ── Dashboard ────────────────────────────────────────────── */}
           {page === 'home' && (
             <div className="flex flex-col gap-10">
 
+              {/* Search */}
               <section className="flex flex-col items-center">
                 <SearchBar onSearch={handleSearch} isLoading={isLoading} />
               </section>
 
+              {/* Error */}
               {error && (
-                <div className="rounded-2xl border border-red-900/50 bg-red-950/20 p-5 text-center animate-fade-in-up">
-                  <p className="text-sm text-red-400 font-medium">{error}</p>
+                <div
+                  className="rounded-2xl border p-4 text-center animate-fade-in-up"
+                  style={{ borderColor: 'rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}
+                >
+                  <p className="text-sm font-medium text-red-400">{error}</p>
                 </div>
               )}
 
+              {/* Loading */}
               {isLoading && <LoadingOverlay />}
 
+              {/* Results */}
               {result && !isLoading && (
-                <div className="flex flex-col gap-8 animate-fade-in-up">
+                <div className="flex flex-col gap-7 animate-fade-in-up">
 
-                  {/* Ticker header row */}
-                  <div className="flex items-center justify-between flex-wrap gap-4">
+                  {/* Ticker header */}
+                  <div className="flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl font-black text-white font-outfit tracking-tighter">{result.ticker}</span>
+                      <h2 className="text-2xl font-black text-white font-outfit tracking-tight">{result.ticker}</h2>
                       <span
-                        className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border"
-                        style={{ color: riskColor(result.risk_level), borderColor: riskColor(result.risk_level) }}
+                        className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border"
+                        style={{ color: riskColor(result.risk_level), borderColor: riskColor(result.risk_level) + '66' }}
                       >
                         {result.risk_level} Risk
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="text-right hidden sm:block">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-[var(--text-muted)]">Model Certainty</p>
-                        <p className="text-lg font-black font-jetbrains text-white">
-                          {result.historical_accuracy_pct}<span className="text-xs text-[var(--text-muted)]">%</span>
+                      <div className="hidden sm:block text-right">
+                        <p className="label-xs mb-1">Model Certainty</p>
+                        <p className="text-lg font-black font-jetbrains text-white leading-none">
+                          {result.historical_accuracy_pct}
+                          <span className="text-xs ml-0.5" style={{ color: 'var(--text-muted)' }}>%</span>
                         </p>
                       </div>
                       <button
                         onClick={addToWatchlist}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest border transition-all ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest border transition-all ${
                           isInWatchlist
-                            ? 'bg-white/10 border-white/20 text-white'
-                            : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-white/30 hover:text-white'
+                            ? 'bg-white/8 border-white/15 text-white'
+                            : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-white'
                         }`}
                       >
                         {isInWatchlist ? (
                           <>
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                             Watching
                           </>
                         ) : (
                           <>
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                             </svg>
-                            Add to Watchlist
+                            Watch
                           </>
                         )}
                       </button>
@@ -322,40 +356,44 @@ export default function App() {
                   {/* Price chart */}
                   <PriceChart data={chartData} ticker={result.ticker} isRealData={isRealData} />
 
-                  {/* System inference card */}
-                  <div className="card-noir rounded-3xl p-8 md:p-10 flex flex-col gap-10">
-                    <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-6">
+                  {/* System Inference */}
+                  <div className="card-noir rounded-3xl overflow-hidden">
+                    {/* Card header */}
+                    <div
+                      className="px-8 py-5 border-b flex items-center justify-between"
+                      style={{ borderColor: 'var(--border-subtle)' }}
+                    >
                       <div>
-                        <h2 className="text-xl font-black text-white tracking-tight font-outfit uppercase">
+                        <h2 className="text-base font-black text-white uppercase tracking-widest font-outfit">
                           System Inference
                         </h2>
-                        <p className="text-[10px] text-[var(--text-secondary)] font-medium mt-1 uppercase tracking-widest">
-                          Topological Manifold Analysis — {result.ticker}
+                        <p className="label-xs mt-0.5">
+                          Topological Manifold Analysis · {result.ticker}
                         </p>
                       </div>
                       <div className="text-right sm:hidden">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-[var(--text-muted)]">Certainty</p>
+                        <p className="label-xs mb-1">Certainty</p>
                         <p className="text-base font-black font-jetbrains text-white">
-                          {result.historical_accuracy_pct}<span className="text-xs text-[var(--text-muted)]">%</span>
+                          {result.historical_accuracy_pct}<span className="text-xs ml-0.5" style={{ color: 'var(--text-muted)' }}>%</span>
                         </p>
                       </div>
                     </div>
 
-                    {/* Gauge + Radar */}
-                    <div className="flex flex-col xl:flex-row gap-8 items-start">
-                      <div className="flex-shrink-0 self-center xl:self-auto">
-                        <RiskGauge score={result.hidden_risk_score} />
+                    <div className="p-8 md:p-10 flex flex-col gap-10">
+                      {/* Gauge + Radar */}
+                      <div className="flex flex-col xl:flex-row gap-8 items-center xl:items-start">
+                        <div className="flex-shrink-0">
+                          <RiskGauge score={result.hidden_risk_score} />
+                        </div>
+                        <div className="flex-1 w-full min-w-0">
+                          <FeatureRadar features={result.features || {}} currentPrice={result.current_price} />
+                        </div>
                       </div>
-                      <div className="flex-1 w-full min-w-0">
-                        <FeatureRadar
-                          features={result.features || {}}
-                          currentPrice={result.current_price}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Recommendation */}
-                    <div className="border-t border-[var(--border-subtle)] pt-8">
+                      {/* Divider */}
+                      <div style={{ height: 1, background: 'var(--border-subtle)' }} />
+
+                      {/* Recommendation */}
                       <RecommendationAlert
                         riskLevel={result.risk_level}
                         recommendation={result.recommendation}
@@ -370,20 +408,23 @@ export default function App() {
 
               {/* Empty state */}
               {!result && !isLoading && !error && (
-                <div className="flex flex-col items-center justify-center text-center py-20 animate-fade-in-up">
-                  <div className="w-16 h-16 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center mb-6 rotate-3 shadow-[0_0_30px_rgba(255,255,255,0.02)]">
-                    <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21l-8.244-4.76V7.76L12 3l8.244 4.76v8.48L12 21z" />
+                <div className="flex flex-col items-center justify-center text-center py-24 animate-fade-in-up">
+                  <div
+                    className="w-14 h-14 rounded-2xl border flex items-center justify-center mb-6"
+                    style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+                  >
+                    <svg className="w-6 h-6 text-white opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">Ready for Ingestion</h3>
-                  <p className="text-sm text-[var(--text-secondary)] max-w-sm leading-relaxed font-medium">
-                    Enter a ticker to compute high-dimensional risk coefficients
-                    using Topological Data Analysis and an ensemble ML model.
+                  <h3 className="text-lg font-black text-white mb-2 font-outfit">Ready for Analysis</h3>
+                  <p className="text-sm font-medium max-w-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                    Enter a ticker symbol to compute high-dimensional risk coefficients using Topological Data Analysis.
                   </p>
                   <button
                     onClick={() => setPage('research')}
-                    className="mt-6 text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)] hover:text-white transition-colors border-b border-transparent hover:border-[var(--text-muted)] pb-0.5"
+                    className="mt-5 text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-white"
+                    style={{ color: 'var(--text-muted)' }}
                   >
                     Learn the methodology →
                   </button>
@@ -392,22 +433,33 @@ export default function App() {
             </div>
           )}
 
-          {/* Research page */}
           {page === 'research' && <ResearchPage />}
-
         </main>
       </div>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="border-t border-[var(--border-subtle)] py-10 mt-auto">
-        <div className="max-w-[1400px] mx-auto px-5 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center md:items-start gap-1">
-            <p className="text-xs font-black text-white italic tracking-tighter uppercase font-outfit">TFRO / Research</p>
-            <p className="text-[10px] text-[var(--text-muted)]">© 2026 High-Fidelity Risk Labs</p>
+      {/* ── Footer ───────────────────────────────────────────────────────── */}
+      <footer
+        className="border-t py-8 mt-auto"
+        style={{ borderColor: 'var(--border-subtle)' }}
+      >
+        <div className="max-w-[1400px] mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-black text-white uppercase font-outfit tracking-tight">TFRO</p>
+            <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>© 2026 High-Fidelity Risk Labs</p>
           </div>
-          <div className="flex items-center gap-6 text-[9px] uppercase tracking-[0.25em] font-black text-[var(--text-muted)]">
-            {['Giotto-TDA', 'XGBoost v2', 'FastAPI RT', 'React 19'].map(t => (
-              <span key={t} className="hover:text-white transition-colors cursor-default">{t}</span>
+          <div className="flex items-center gap-5">
+            {['Giotto-TDA', 'XGBoost v2', 'FastAPI', 'React 19'].map((t, i, arr) => (
+              <span key={t} className="flex items-center gap-5">
+                <span
+                  className="text-[9px] uppercase tracking-[0.2em] font-medium transition-colors cursor-default hover:text-white"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  {t}
+                </span>
+                {i < arr.length - 1 && (
+                  <span style={{ color: 'var(--border-accent)' }}>·</span>
+                )}
+              </span>
             ))}
           </div>
         </div>
